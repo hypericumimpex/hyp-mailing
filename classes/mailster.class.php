@@ -15,9 +15,9 @@ class Mailster {
 	static $form_active;
 
 	public function __construct() {
-		update_option( 'mailster_license', '853e9c5a-0d81-4a77-bf50-03936c88681a' );
-		update_option( 'mailster_email', 'nulled@pro.webber' );
-		update_option( 'mailster_username', 'prowebber' );
+		  update_option( 'mailster_license', '853e9c5a-0d81-4a77-bf50-03936c88681a' );
+		  update_option( 'mailster_email', 'nu@ll.ed' );
+		  update_option( 'mailster_username', 'nulled' );
 
 		register_activation_hook( MAILSTER_FILE, array( &$this, 'activate' ) );
 		register_deactivation_hook( MAILSTER_FILE, array( &$this, 'deactivate' ) );
@@ -1514,11 +1514,11 @@ class Mailster {
 
 				if ( deactivate_plugins( 'myMail/myMail.php', true, is_network_admin() ) ) {
 					mailster_notice( 'MyMail is now Mailster! The old version has been deactivated and can get removed!', 'error', false, 'warnings' );
-					mailster_update_option( 'update_required', true );
+					mailster_update_option( 'db_update_required', true );
 				}
 			} elseif ( get_option( 'mymail' ) ) {
 
-				mailster_update_option( 'update_required', true );
+				mailster_update_option( 'db_update_required', true );
 
 			} else {
 
@@ -2148,7 +2148,14 @@ class Mailster {
 			}
 		}
 
-		$content_type = apply_filters( 'wp_mail_content_type', 'text/plain' );
+		$content_type = 'text/plain';
+		$third_party_content_type = apply_filters( 'wp_mail_content_type', 'text/plain' );
+		if ( isset( $args['headers'] ) && ! empty( $args['headers'] ) && preg_match( '#content-type:(.*)text/html#i', implode( "\r\n", $args['headers'] ) ) ) {
+			$third_party_content_type = 'text/html';
+		}
+		if ( mailster_option( 'respect_content_type' ) ) {
+			$content_type = $third_party_content_type;
+		}
 
 		$template = mailster_option( 'default_template' );
 		$template = apply_filters( 'mailster_wp_mail_template', $template, $caller, $current_filter );
@@ -2157,8 +2164,8 @@ class Mailster {
 			$file = mailster_option( 'system_mail_template', 'notification.html' );
 			add_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
 		} else {
-			$file = false;
 			remove_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
+			$file = false;
 		}
 		$file = apply_filters( 'mymail_wp_mail_template_file', apply_filters( 'mailster_wp_mail_template_file', $file, $caller, $current_filter ), $caller, $current_filter );
 
@@ -2180,12 +2187,14 @@ class Mailster {
 
 		if ( 'text/plain' == $content_type ) {
 
-			if ( apply_filters( 'mymail_wp_mail_htmlify', apply_filters( 'mailster_wp_mail_htmlify', true ) ) ) {
+			if ( apply_filters( 'mymail_wp_mail_htmlify', apply_filters( 'mailster_wp_mail_htmlify', true ) ) && 'text/html' != $third_party_content_type ) {
 				$message = $this->wp_mail_map_links( $message );
 				$message = str_replace( array( '<br>', '<br />', '<br/>' ), "\n", $message );
 				$message = preg_replace( '/(?:(?:\r\n|\r|\n)\s*){2}/s', "\n", $message );
 				$message = wpautop( $message, true );
 			}
+		} else {
+			remove_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
 		}
 
 		$placeholder = mailster( 'placeholder', $content );
@@ -2279,14 +2288,20 @@ class Mailster {
 			$headers = implode( "\r\n", $headers ) . "\r\n";
 		}
 
-		$content_type = apply_filters( 'wp_mail_content_type', 'text/plain' );
+		$content_type = 'text/plain';
+		$third_party_content_type = apply_filters( 'wp_mail_content_type', 'text/plain' );
+		if ( preg_match( '#content-type:(.*)text/html#i', $headers ) ) {
+			$third_party_content_type = 'text/html';
+		}
+		if ( mailster_option( 'respect_content_type' ) ) {
+			$content_type = $third_party_content_type;
+		}
 
 		if ( 'text/plain' == $content_type ) {
 
 			$message = $this->wp_mail_map_links( $message );
-
 			// only if content type is not html
-			if ( ! preg_match( '#content-type:(.*)text/html#i', $headers ) ) {
+			if ( ! preg_match( '#content-type:(.*)text/html#i', $headers ) && 'text/html' != $third_party_content_type ) {
 				$message = str_replace( array( '<br>', '<br />', '<br/>' ), "\n", $message );
 				$message = preg_replace( '/(?:(?:\r\n|\r|\n)\s*){2}/s', "\n", $message );
 				$message = wpautop( $message, true );
@@ -2315,9 +2330,8 @@ class Mailster {
 		if ( 'text/plain' == $content_type ) {
 			$file = ! is_null( $file ) ? $file : mailster_option( 'system_mail_template', 'notification.html' );
 			add_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
-		} else {
-			remove_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
 		}
+
 		$file = apply_filters( 'mymail_wp_mail_template_file', apply_filters( 'mailster_wp_mail_template_file', $file, $caller, $current_filter ), $caller, $current_filter );
 
 		$mail = mailster( 'mail' );
@@ -2361,6 +2375,8 @@ class Mailster {
 		$headline = apply_filters( 'mymail_send_headline', apply_filters( 'mailster_send_headline', $subject ) );
 
 		$success = (bool) $mail->send_notification( $message, $headline, $replace, false, $file, $template );
+
+		remove_filter( 'wp_mail_content_type', array( &$this, 'wp_mail_content_type' ), 99 );
 
 		if ( ! $success ) {
 
@@ -2529,7 +2545,7 @@ class Mailster {
 	 */
 	public function is_verified( $force = false ) {
 		mailster_remove_notice( 'verify' );
-		return true;
+                return true;
 		$license = $this->license();
 		$license_email = $this->email();
 		$license_user = $this->username();

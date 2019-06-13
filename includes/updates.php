@@ -14,12 +14,8 @@ $new_version = MAILSTER_VERSION;
 $texts = isset( $mailster_options['text'] ) && ! empty( $mailster_options['text'] ) ? $mailster_options['text'] : $mailster_texts;
 $show_update_notice = false;
 
-// update db structure
-mailster()->dbstructure();
-
 $default_options = mailster( 'settings' )->get_defaults();
 $default_texts = mailster( 'settings' )->get_default_texts();
-
 
 if ( $old_version ) {
 
@@ -561,7 +557,7 @@ if ( $old_version ) {
 			$wpdb->query( "ALTER TABLE {$wpdb->prefix}mailster_subscriber_meta CHANGE `subscriber_id` `subscriber_id` BIGINT(20)  UNSIGNED  NULL  DEFAULT NULL" );
 			$mailster_options['_flush_rewrite_rules'] = true;
 		case '2.3.14':
-			set_transient( 'mailster_check_verification', true, WEEK_IN_SECONDS );
+
 			// remove entries caused by wrong tracking
 			$wpdb->query( "DELETE FROM {$wpdb->prefix}mailster_actions WHERE subscriber_id = 0" );
 
@@ -582,6 +578,8 @@ if ( $old_version ) {
 			// no longer in use
 			delete_option( 'mailster_template_licenses' );
 			$mailster_options['welcome'] = true;
+
+		case '2.4':
 
 		default:
 
@@ -615,6 +613,7 @@ mailster_clear_cache( );
 
 // delete plugin hash
 delete_transient( 'mailster_hash' );
+
 
 // mailster_update_option('welcome', true);
 add_action( 'shutdown', array( 'UpdateCenterPlugin', 'clear_options' ) );
