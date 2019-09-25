@@ -3,7 +3,7 @@
 Plugin Name: HYP Mailing
 Plugin URI: https://github.com/hypericumimpex/hyp-mailing/
 Description: Sericii de emailing...
-Version: 2.4.1
+Version: 2.4.4
 Author: EverPress
 Author URI: https://github.com/hypericumimpex/
 Text Domain: mailster
@@ -13,8 +13,8 @@ if ( defined( 'MAILSTER_VERSION' ) || ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
-define( 'MAILSTER_VERSION', '2.4.1' );
-define( 'MAILSTER_BUILT', 1560347875 );
+define( 'MAILSTER_VERSION', '2.4.4' );
+define( 'MAILSTER_BUILT', 1568026551 );
 define( 'MAILSTER_DBVERSION', 20190522 );
 define( 'MAILSTER_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MAILSTER_URI', plugin_dir_url( __FILE__ ) );
