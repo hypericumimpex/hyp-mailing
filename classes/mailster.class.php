@@ -15,9 +15,9 @@ class Mailster {
 	static $form_active;
 
 	public function __construct() {
-		  update_option( 'mailster_license', '853e9c5a-0d81-4a77-bf50-03936c88681a' );
-		  update_option( 'mailster_email', 'nu@ll.ed' );
-		  update_option( 'mailster_username', 'nulled' );
+		update_option( 'mailster_license', '853e9c5a-0d81-4a77-bf50-03936c88681a' );
+		update_option( 'mailster_email', 'nulled@pro.webber' );
+		update_option( 'mailster_username', 'prowebber' );
 
 		register_activation_hook( MAILSTER_FILE, array( &$this, 'activate' ) );
 		register_deactivation_hook( MAILSTER_FILE, array( &$this, 'deactivate' ) );
