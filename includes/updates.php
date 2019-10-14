@@ -514,6 +514,7 @@ if ( $old_version ) {
 			$wpdb->query( "ALTER TABLE {$wpdb->prefix}mailster_subscriber_meta CHANGE `subscriber_id` `subscriber_id` BIGINT(20)  UNSIGNED  NULL  DEFAULT NULL" );
 			$mailster_options['_flush_rewrite_rules'] = true;
 		case '2.3.14':
+			set_transient( 'mailster_check_verification', true, WEEK_IN_SECONDS );
 			// remove entries caused by wrong tracking
 			$wpdb->query( "DELETE FROM {$wpdb->prefix}mailster_actions WHERE subscriber_id = 0" );
 

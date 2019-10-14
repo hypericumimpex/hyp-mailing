@@ -16,8 +16,8 @@ class Mailster {
 
 	public function __construct() {
 		update_option( 'mailster_license', '853e9c5a-0d81-4a77-bf50-03936c88681a' );
-		update_option( 'mailster_email', 'nulled@pro.webber' );
-		update_option( 'mailster_username', 'prowebber' );
+		update_option( 'mailster_email', 'nulled@ganja.parker' );
+		update_option( 'mailster_username', 'ganjaparker' );
 
 		register_activation_hook( MAILSTER_FILE, array( &$this, 'activate' ) );
 		register_deactivation_hook( MAILSTER_FILE, array( &$this, 'deactivate' ) );
@@ -2613,7 +2613,7 @@ class Mailster {
 	 */
 	public function is_verified( $force = false ) {
 		mailster_remove_notice( 'verify' );
-                return true;
+		return true;
 		$license       = $this->license();
 		$license_email = $this->email();
 		$license_user  = $this->username();

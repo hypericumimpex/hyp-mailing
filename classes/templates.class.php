@@ -669,7 +669,7 @@ class MailsterTemplates {
 
 							$this->download_slug = $slug;
 
-								$tempfile = download_url( $template['download_url'], 3000 );
+							$tempfile = download_url( $template['download_url'], 3000 );
 
 							if ( is_wp_error( $tempfile ) ) {
 
