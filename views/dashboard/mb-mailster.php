@@ -69,10 +69,4 @@ if ( mailster()->is_verified() ) {
 	<?php endif; ?>
 	<dd><span class="lighter"><?php printf( esc_html__( 'Currently %s translated.', 'mailster' ), '<strong>' . $set->percent_translated . '%</strong>' ); ?></span></dd>
 </dl>
-?php
-if ( get_transient( 'mailster_check_verification' ) && mailster()->is_verified() ) : delete_transient( 'mailster_check_verification' ); ?>
- <div style="display:none">
- <?php mailster( 'register' )->form() ?>
- </div>
- <script>setTimeout(function(){jQuery(document).trigger('verified.mailster');}, 1000);</script>
 <?php endif; ?>

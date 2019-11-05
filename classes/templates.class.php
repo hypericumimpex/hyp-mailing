@@ -669,7 +669,11 @@ class MailsterTemplates {
 
 							$this->download_slug = $slug;
 
-							$tempfile = download_url( $template['download_url'], 3000 );
+							if ( ! mailster()->is_verified() ) {
+								$tempfile = new WP_Error( 'licenses_required', sprintf( esc_html__( 'To download this free template you have to enter your Mailster license on %s.', 'mailster' ), '<a href="' . admin_url( 'admin.php?page=mailster_dashboard' ) . '">' . esc_html__( 'the dashboard', 'mailster' ) . '</a>' ) );
+							} else {
+								$tempfile = download_url( $template['download_url'], 3000 );
+							}
 
 							if ( is_wp_error( $tempfile ) ) {
 
